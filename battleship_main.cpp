@@ -11,8 +11,11 @@ int main() {
    bool done = false;
    string move;
 
-   // Welcome the player to the game
-
+   welcome();
+   Board computerBoard;
+   Board humanBoard;
+   initializeBoard(computerBoard);
+   initializeBoard(humanBoard);
    // Initialize the game boards
 
    // Play the game until one player has sunk the other's ships
