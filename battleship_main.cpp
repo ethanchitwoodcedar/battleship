@@ -1,73 +1,110 @@
-// Author:
-// Date:
-// Purpose:
+// Author: Ethan Chitwood
+// Date: 11/12/24
+// Purpose: CS1210
 
 #include "battleship.h"
 
 int main() {
 
-   // variable declarations (you'll need others, of course)
-   // Note: a good idea is the declare them as you need them to limit scope
    bool done = false;
+   bool moveInvalid = true;
    string move;
+   string humMove;
+   int resultHum;
+   int resultCom;
+   int moveCheck;
+   int row;
+   int col;
+   int comTally = 0;
+   int humTally = 0;
 
    welcome();
    Board computerBoard;
    Board humanBoard;
    initializeBoard(computerBoard);
    initializeBoard(humanBoard);
-   // Initialize the game boards
+   pauseForEnter();
+   clearTheScreen();
 
    // Play the game until one player has sunk the other's ships
    while (!done) {
 
-      // Clear the screen to prepare show the game situation before the moves
-      // Display the game board situation
+      clearTheScreen();
+      displayBoard(1, 1, HUMAN, humanBoard);
+      displayBoard(1, 35, COMPUTER, computerBoard);
 
-      // Get and validate the human player's move
-      // BTW, in the following while loop (and the if statements also), I have
-      // put a "0" in with the comments.  This is because in order for the
-      // code to compile, you need to have something in between the parentheses
+      while (moveInvalid) {
+	 move = getResponse(15, 1,"Please enter your move: ");
+	 moveCheck = checkMove(move, computerBoard, row, col);
+	 if (moveCheck == VALID_MOVE) {
+	    moveInvalid = false;
 
-      while (0/* need to make sure that the human player's move is valid*/) {
-			;
+	 } 
+	 else if (moveCheck == ILLEGAL_FORMAT) {
+            clearTheLine(14);
+	    writeMessage(14, 1, "Invalid Move. Illegal format.");
+	 }
+	 else if (moveCheck == REUSED_MOVE) {
+            clearTheLine(14);
+	    writeMessage(14, 1, "Invalid Move. Move already taken.");
+	 }
       }
+
+      resultHum = playMove(row, col, computerBoard);
+      moveInvalid = true;
+      humMove = move;
 
       // Get and validate the computer's move
-      while (0/* need to make sure that the computer's move is valid*/) {
-			;
+      while (moveInvalid) {
+         move = randomMove();
+         moveCheck = checkMove(move, humanBoard, row, col);
+         if (moveCheck == VALID_MOVE) {
+            moveInvalid = false;
+         }
       }
 
-      // Execute both moves
-      // Clear the screen to show the new game situation after the moves
-      // Display the new game board situation
-      // Display the move choices each player made
-      // Show the results of the moves
-      // Take note if there are any sunken ships
+      resultCom = playMove(row, col, humanBoard);
+      moveInvalid = true;
+      
+      clearTheScreen();
+      displayBoard(1, 1, HUMAN, humanBoard);
+      displayBoard(1, 35, COMPUTER, computerBoard);
+
+      if (resultHum != 0) {
+         humTally++;
+      }
+      if (resultCom != 0) {
+         comTally++;
+      }
+      
+      writeMessage(15, 1, "You chose: " + humMove);
+      writeMessage(16, 1, "The computer chose: " + move);
+      writeResult(18, 1, resultHum, HUMAN); 
+      writeResult(19, 1, resultCom, COMPUTER);
 
       // determine if we have a winner
-      if (0/* has either player sunk five ships? */) {
-         // if one of the player's has sunk five ships the game is over
+      if (humTally == 17 || comTally == 17) {
          done = true;
       } 
       else {
-         // pause to let the user assess the situation
          pauseForEnter();
       }
    }
 
    // Announce the winner
-   if (0/* the human was the winner */) {
-      /* You won!!! */;
+   if (humTally > comTally) {
+      writeMessage(21, 1, "You Won!");
    }
-   else if (0/* the computer was the winner */) {
-      /* The computer won :( */;
+   else if (comTally > humTally) {
+      writeMessage(21, 1, "Computer Won!");
+      
    }
    else {
-      /* The game was a tie */;
+      writeMessage(21, 1, "The game was a tie!");
    }
 
-   // pause to let the result of the game sink in
+   pauseForEnter();
+   clearTheScreen();
 
    return 0;
 }
